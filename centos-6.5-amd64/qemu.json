@@ -1,0 +1,42 @@
+{
+  "builders": [
+    {
+      "type": "qemu",
+      "iso_url": "http://mirrors.cat.pdx.edu/centos/6.5/isos/x86_64/CentOS-6.5-x86_64-minimal.iso",
+      "iso_checksum": "0d9dc37b5dd4befa1c440d2174e88a87",
+      "iso_checksum_type": "md5",
+      "output_directory": "output/qemu",
+      "ssh_wait_timeout": "30s",
+      "shutdown_command": "shutdown -P now",
+      "disk_size": 5000,
+      "format": "qcow2",
+      "headless": true,
+      "accelerator": "kvm",
+      "http_directory": "http",
+      "ssh_username": "packer",
+      "ssh_password": "packer",
+      "ssh_port": 22,
+      "ssh_wait_timeout": "90m",
+      "net_device": "virtio-net",
+      "disk_interface": "virtio",
+      "boot_wait": "5s",
+      "shutdown_command": "echo '/sbin/halt -h -p' > shutdown.sh; echo 'packer'|sudo -S sh 'shutdown.sh'",
+      "boot_command": [
+        "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg<enter><wait>"
+      ]
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "scripts": [
+        "scripts/cleanup.sh"
+      ],
+      "override": {
+        "qemu": {
+          "execute_command": "echo 'packer'|sudo -S sh '{{.Path}}'"
+        }
+      }
+    }
+  ]
+}
